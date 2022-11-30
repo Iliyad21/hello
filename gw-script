@@ -1,0 +1,14 @@
+#!/bin/bash
+# this script sets a transient gw
+sudo -i
+ip address add 192.168.99.1/30 broadcast 192.168.99.3 dev enp0s8
+ip --brief address
+sleep 3
+echo 1 > /proc/sys/net/ipv4/ip_forward && cat /proc/sys/net/ipv4/ip_forward
+sleep 3
+nft list ruleset
+nft add table ip firewall
+nft add chain ip firewall POSTROUTING '{ type nat hook postrouting priority 100; policy accept; }'
+nft add rule ip nat POSTROUTING oifname "enp0s3" counter masquerade nft list table nat
+nft list ruleset
+sleep 3

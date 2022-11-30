@@ -1,0 +1,13 @@
+#!/bin/bash
+# this script sets a permanent node
+ip --brief address && ip route
+sleep 5
+ip link set dev enp0s3 down
+dhclient -r enp0s3
+ip --brief address && ip route
+sleep 3
+touch /etc/netplan/99_config.yaml
+echo -e 'network:\n    version: 2\n    renderer: networkd\n    ethernets:\n        enp0s3:\n            dhcp4: false\n        enp0s8:\n            addresses:\n                - 192.168.11.2/29\n\n            routes:\n                - to: default\n                  via: 192.168.11.1' > /etc/netplan/99_config.yaml
+cat /etc/netplan/99_config.yaml
+sleep 3
+netplan apply
